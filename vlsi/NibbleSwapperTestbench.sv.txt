@@ -1,0 +1,62 @@
+// nibble_swapper_tb.v
+`timescale 1ns / 1ps
+
+module nibble_swapper_tb;
+
+  // Signals to drive DUT
+  reg [7:0] in_data;
+  reg swap;
+  wire [7:0] out_data;
+
+  // Instantiate the Design Under Test (DUT)
+  NibbleSwapper uut (
+    .in_data(in_data),
+    .swap(swap),
+    .out_data(out_data)
+  );
+
+  // Test stimulus
+  initial begin
+    // Header
+    $display("Time   swap in_data   out_data");
+
+    // Initial state: swap = 0
+    swap = 0;
+    in_data = 8'h5A; // 0101_1010
+    #10;
+    $display("%0d     %b    %h        %h", $time, swap, in_data, out_data);
+
+    // Test case: swap = 1
+    swap = 1;
+    in_data = 8'h5A;
+    #10;
+    $display("%0d     %b    %h        %h", $time, swap, in_data, out_data);
+
+    // More patterns
+    swap = 0;
+    in_data = 8'h3C; // 0011_1100
+    #10;
+    $display("%0d     %b    %h        %h", $time, swap, in_data, out_data);
+
+    swap = 1;
+    in_data = 8'h3C;
+    #10;
+    $display("%0d     %b    %h        %h", $time, swap, in_data, out_data);
+
+    swap = 1;
+    in_data = 8'hA5; // 1010_0101
+    #10;
+    $display("%0d     %b    %h        %h", $time, swap, in_data, out_data);
+
+    swap = 0;
+    in_data = 8'hFF;
+    #10;
+    $display("%0d     %b    %h        %h", $time, swap, in_data, out_data);
+
+    // Finish
+    #10;
+    $finish;
+  end
+
+endmodule
+

@@ -1,0 +1,49 @@
+`timescale 1ns / 1ps
+
+module tb;
+
+  reg clk = 0;
+  reg rst = 1;
+  reg in_signal = 0;
+  wire flag;
+
+  SeqCheck uut (
+    .clk(clk),
+    .rst(rst),
+    .in_signal(in_signal),
+    .flag(flag)
+  );
+
+  always #5 clk = ~clk;
+
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0, tb);
+    $display("Time\tclk\trst\tin_signal\tflag");
+    $monitor("%0t\t%b\t%b\t%b\t\t%b", $time, clk, rst, in_signal, flag);
+
+    // Deassert reset
+    #12 rst = 0;
+
+    // Three rising edges within 5 cycles
+    in_signal = 0; #10;
+    in_signal = 1; #10;
+    in_signal = 0; #10;
+    in_signal = 1; #10;
+    in_signal = 0; #10;
+    in_signal = 1; #10;
+
+    in_signal = 0; #50;
+
+    // Delayed edges (won't trigger flag)
+    in_signal = 1; #10;
+    in_signal = 0; #30;
+    in_signal = 1; #10;
+    in_signal = 0; #30;
+    in_signal = 1; #10;
+
+    #50;
+    $finish;
+  end
+
+endmodule

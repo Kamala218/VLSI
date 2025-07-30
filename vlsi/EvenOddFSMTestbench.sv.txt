@@ -1,0 +1,48 @@
+// even_odd_fsm_tb.sv
+`timescale 1ns / 1ps
+
+module even_odd_fsm_tb;
+  // Testbench signals
+  reg clk = 0;
+  reg rst = 1;
+  reg valid = 0;
+  reg [3:0] in_num = 4'b0000;
+  wire even_flag;
+
+  // Clock generation
+  always #5 clk = ~clk;
+
+  // Instantiate DUT
+  EvenOddFSM dut (
+    .clk(clk),
+    .rst(rst),
+    .in_num(in_num),
+    .valid(valid),
+    .even_flag(even_flag)
+  );
+
+  // Waveform dump
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0, even_odd_fsm_tb);
+  end
+
+  // Stimulus
+  initial begin
+    #10 rst = 0;
+    #10 valid = 1; in_num = 4'h2;   // even → flag = 1
+    #10 in_num = 4'h3;              // odd  → flag = 0
+    #10 valid = 0;
+    #10 valid = 1; in_num = 4'h4;   // even → flag = 1
+    #10 in_num = 4'h5;              // odd  → flag = 0
+    #20 $finish;
+  end
+
+  // Monitor outputs
+  initial begin
+    $display("time clk rst valid in_num even_flag");
+    $monitor("%0t    %b   %b    %b     %h      %b",
+             $time, clk, rst, valid, in_num, even_flag);
+  end
+
+endmodule

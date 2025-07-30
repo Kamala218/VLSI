@@ -1,0 +1,51 @@
+`timescale 1ns / 1ps
+
+module tb;
+
+    reg clk = 0;
+    reg rst = 1;
+    reg dir = 1; // 1 = left, 0 = right
+    reg [7:0] in_data = 8'b10110011;
+    wire [7:0] out_data;
+
+    // Instantiate DUT
+    RotatorUnit uut (
+        .clk(clk),
+        .rst(rst),
+        .dir(dir),
+        .in_data(in_data),
+        .out_data(out_data)
+    );
+
+    // Clock generation
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, tb);
+        $display("Time\tclk\trst\tdir\tin_data\t\tout_data");
+        $monitor("%0t\t%b\t%b\t%b\t%8b\t%8b", $time, clk, rst, dir, in_data, out_data);
+
+        // Initial Reset
+        #12 rst = 0;
+
+        // Rotate left for 5 cycles
+        dir = 1;
+        #50;
+
+        // Rotate right for 5 cycles
+        dir = 0;
+        #50;
+
+        // Change input and reset again
+        in_data = 8'b11001100;
+        rst = 1; #10; rst = 0;
+
+        // Rotate left again
+        dir = 1;
+        #40;
+
+        $finish;
+    end
+
+endmodule

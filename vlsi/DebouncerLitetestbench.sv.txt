@@ -1,0 +1,50 @@
+`timescale 1ns / 1ps
+
+module debouncerlite_tb;
+
+  reg clk = 0;
+  reg rst = 1;
+  reg noisy_in = 0;
+  wire clean_out;
+
+  // Instantiate the DUT
+  DebouncerLite uut (
+    .clk(clk),
+    .rst(rst),
+    .noisy_in(noisy_in),
+    .clean_out(clean_out)
+  );
+
+  // Clock generation
+  always #5 clk = ~clk;
+
+  // Stimulus
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0, debouncerlite_tb);
+
+    $display("Time\tclk\trst\tnoisy_in\tclean_out");
+    $monitor("%0t\t%b\t%b\t%b\t\t%b", $time, clk, rst, noisy_in, clean_out);
+
+    // Reset for a short time
+    #12 rst = 0;
+
+    // Simulate bouncing: 1-0-1-0-1
+    noisy_in = 1; #10;
+    noisy_in = 0; #10;
+    noisy_in = 1; #10;
+    noisy_in = 0; #10;
+    noisy_in = 1; #10;
+
+    // Stable HIGH for 3+ clocks
+    noisy_in = 1; #30;
+
+    // Stable LOW for 3+ clocks
+    noisy_in = 0; #30;
+
+    // Finish
+    #20;
+    $finish;
+  end
+
+endmodule
