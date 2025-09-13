@@ -1,8 +1,0 @@
-module GrayCoder (
-    input wire [3:0] binary_in,
-    output reg [3:0] gray_out
-);
-    always @(*) begin
-        gray_out = binary_in ^ (binary_in >> 1);
-    end
-endmodule
